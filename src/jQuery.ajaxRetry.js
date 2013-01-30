@@ -2,42 +2,48 @@
     "use strict";
     
     var retryKey = "__RETRY__";
-    
-    function returnFalse() {
-        return false;
-    }
 
     $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
-        var dfr, completeDeferred, statusCode, shouldRetry;
-        
         // Don't handle a call that's already "fixed".
         if ( options[retryKey] ) {
             return;
         }
+        
+        // Mark this as having been processed so the prefilter doesn't touch subsequent retried requests
+        originalOptions[ retryKey ] = true;
+        
+        // We haven't retried anything yet, so start us out at 0;
+        originalOptions.retryCount = 0;
 
-        dfr = $.Deferred();
-        completeDeferred = $.Deferred();
+        var dfr = $.Deferred(),
+            completeDeferred = $.Deferred(),
+            statusCode = originalOptions.statusCode,
+            shouldRetry = function( jqXHR, retryCount ) {
+                var result,
+                    test = originalOptions.shouldRetry,
+                    type = typeof test;
+                    
+                switch( type ) {
+                    case "number":
+                        result = retryCount < test;
+                        break;
+                    case "boolean":
+                        result = test;
+                        break;
+                    case "function":
+                        result = test( jqXHR, retryCount );
+                        break;
+                }
+
+                return $.when( result );
+            };
         
         dfr.then( options.success, options.error );
         completeDeferred.done( options.complete );
 
         // Completely obliterate the original request state handlers since we want to handle them manually.
         options.success = options.error = options.complete = originalOptions.success =
-            originalOptions.error = originalOptions.complete = undefined;
-        
-        statusCode = originalOptions.statusCode;
-        
-        originalOptions.statusCode = options.statusCode = undefined;
-
-        // We haven't retried anything yet, so start us out at 0;
-        originalOptions.retryCount = 0;
-        
-        // Mark this as having been processed so the prefilter doesn't touch subsequent retried requests
-        originalOptions[ retryKey ] = true;
-        
-        shouldRetry = function( jqXHR, retryCount ) {
-            return $.when( (originalOptions.shouldRetry || returnFalse)(jqXHR, retryCount) );
-        };
+            originalOptions.error = originalOptions.complete = options.statusCode = originalOptions.statusCode = undefined;
 
         function retryRequest( options, lastJqXHR ) {
             var willRetryDeferred = $.Deferred();

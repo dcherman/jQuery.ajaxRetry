@@ -1,4 +1,4 @@
-/*global module:false, test:false, ok:false, expect:false, asyncTest:false, start:false, jqVersion:false */
+/*global module:false, test:false, ok:false, expect:false, jqVersion:false */
 
 (function() {
     var supportMock = $.mockjax({
@@ -13,6 +13,10 @@
     module( "Ajax Retry Tests", {
         setup: function() {
             var failThenSuccessCalled = false;
+            
+            $.ajaxSetup({
+                async: false
+            });
             
             this.successMock = $.mockjax({
                 url: "success",
@@ -46,6 +50,10 @@
             $.mockjaxClear( this.successMock );
             $.mockjaxClear( this.failureMock );
             $.mockjaxClear( this.failThenSuccessMock );
+            
+            $.ajaxSetup({
+                async: true
+            });
         }
     });
 
@@ -56,93 +64,69 @@
         ok( jQuery.fn.jquery === jqVersion, "The correct version of jQuery is being tested" );
     });
     
-    asyncTest( "statusCode - no retry, successful", function() {
-        expect(2);
-        var callbackCalled = false;
+    test( "shouldRetry - boolean ( true )", function() {
+        expect(1);
         
         $.ajax({
-            url: "success",
-            statusCode: {
-                200: function( data, textStatus, jqXHR ) {
-                    ok( jqXHR.getAllResponseHeaders && textStatus === "success" && data === "success", "Our success callback's parameters are correct" );
-                    ok( !callbackCalled, "Our success callback should only be called once" );
-                    callbackCalled = true;
-                    start();
-                },
-                500: function() {
-                    ok( false, "The 500 statusCode handler shouldn't be invoked" );
-                }
+            url: "failThenSuccess",
+            shouldRetry: true,
+            success: function() {
+                ok( true, "Our success callback was called" );
             }
         });
     });
     
-    asyncTest( "statusCode - with retry, successful", function() {
-        expect(2);
-        var callbackCalled = false;
-
+    test( "shouldRetry - boolean ( false )", function() {
+        expect(1);
+        
+        $.ajax({
+            url: "failThenSuccess",
+            shouldRetry: false,
+            error: function() {
+                ok( true, "Our error callback was called" );
+            }
+        });
+    });
+    
+    test( "shouldRetry - number( 1 )", function() {
+        expect(1);
+        
+        $.ajax({
+            url: "failThenSuccess",
+            shouldRetry: 1,
+            success: function() {
+                ok( true, "Our success callback was called" );
+            }
+        });
+    });
+    
+    test( "shouldRetry - number( 0 )", function() {
+        expect(1);
+        
+        $.ajax({
+            url: "failThenSuccess",
+            shouldRetry: 0,
+            error: function() {
+                ok( true, "Our error callback was called" );
+            }
+        });
+    });
+    
+    test( "shouldRetry - function", function() {
+        expect(1);
+        
         $.ajax({
             url: "failThenSuccess",
             shouldRetry: function() {
                 return true;
             },
-            statusCode: {
-                200: function( data, textStatus, jqXHR ) {
-                    ok( jqXHR.getAllResponseHeaders && textStatus === "success" && data === "success", "Our success callback's parameters are correct" );
-                    ok( !callbackCalled, "Our success callback should only be called once" );
-                    callbackCalled = true;
-                    start();
-                },
-                500: function() {
-                    ok( false, "The 500 statusCode handler shouldn't be invoked" );
-                }
+            success: function() {
+                ok( true, "Our success callback was called" );
             }
         });
     });
     
-    asyncTest( "statusCode - without retry, failure", function() {
-        expect(2);
-        var callbackCalled = false;
-
-        $.ajax({
-            url: "failure",
-            shouldRetry: function() {
-                return false;
-            },
-            statusCode: {
-                500: function( jqXHR, textStatus, errorThrown ) {
-                    ok( jqXHR.getAllResponseHeaders && textStatus === "error" && errorThrown === "error", "Our error callback's parameters are correct" );
-                    ok( !callbackCalled, "Our error callback should only be called once" );
-                    callbackCalled = true;
-                    start();
-                }
-            }
-        });
-    });
-    
-    asyncTest( "statusCode - with retry, successful", function() {
-        expect(2);
-        var callbackCalled = false;
-
-        $.ajax({
-            url: "failThenSuccess",
-            shouldRetry: function() {
-                return true;
-            },
-            statusCode: {
-                200: function( data, textStatus, jqXHR ) {
-                    ok( jqXHR.getAllResponseHeaders && textStatus === "success" && data === "success", "Our success callback's parameters are correct" );
-                    ok( !callbackCalled, "Our success callback should only be called once" );
-                    callbackCalled = true;
-                    start();
-                },
-                500: function() {
-                    ok( false, "The 500 statusCode handler shouldn't be invoked" );
-                }
-            }
-        });
-    });
-    
-    asyncTest( "shouldRetry returning promise", function() {
+    test( "shouldRetry - promise( true )", function() {
         expect(1);
         
         $.ajax({
@@ -153,28 +137,114 @@
                 return dfr.promise();
             },
             success: function() {
-                ok( true, "We successfully retried with shouldRetry returning a promise" );
-                start();
+                ok( true, "Our success callback was called" );
             }
         });
     });
     
-    asyncTest( "shouldRetry returning false", function() {
+    test( "shouldRetry - promise( false )", function() {
+        expect(1);
+        
+        $.ajax({
+            url: "failThenSuccess",
+            shouldRetry: function() {
+                var dfr = $.Deferred();
+                dfr.resolve( false );
+                return dfr.promise();
+            },
+            error: function() {
+                ok( true, "Our error callback was called" );
+            }
+        });
+    });
+    
+    test( "statusCode - no retry, successful", function() {
+        expect(2);
+        var callbackCalled = false;
+        
+        $.ajax({
+            url: "success",
+            statusCode: {
+                200: function( data, textStatus, jqXHR ) {
+                    ok( jqXHR.getAllResponseHeaders && textStatus === "success" && data === "success", "Our success callback's parameters are correct" );
+                    ok( !callbackCalled, "Our success callback should only be called once" );
+                    callbackCalled = true;
+                },
+                500: function() {
+                    ok( false, "The 500 statusCode handler shouldn't be invoked" );
+                }
+            }
+        });
+    });
+    
+    test( "statusCode - with retry, successful", function() {
+        expect(2);
+        var callbackCalled = false;
+
+        $.ajax({
+            url: "failThenSuccess",
+            shouldRetry: true,
+            statusCode: {
+                200: function( data, textStatus, jqXHR ) {
+                    ok( jqXHR.getAllResponseHeaders && textStatus === "success" && data === "success", "Our success callback's parameters are correct" );
+                    ok( !callbackCalled, "Our success callback should only be called once" );
+                    callbackCalled = true;
+                },
+                500: function() {
+                    ok( false, "The 500 statusCode handler shouldn't be invoked" );
+                }
+            }
+        });
+    });
+    
+    test( "statusCode - without retry, failure", function() {
+        expect(2);
+        var callbackCalled = false;
+
+        $.ajax({
+            url: "failure",
+            statusCode: {
+                500: function( jqXHR, textStatus, errorThrown ) {
+                    ok( jqXHR.getAllResponseHeaders && textStatus === "error" && errorThrown === "error", "Our error callback's parameters are correct" );
+                    ok( !callbackCalled, "Our error callback should only be called once" );
+                    callbackCalled = true;
+                }
+            }
+        });
+    });
+    
+    test( "statusCode - with retry, successful", function() {
+        expect(2);
+        var callbackCalled = false;
+
+        $.ajax({
+            url: "failThenSuccess",
+            shouldRetry: true,
+            statusCode: {
+                200: function( data, textStatus, jqXHR ) {
+                    ok( jqXHR.getAllResponseHeaders && textStatus === "success" && data === "success", "Our success callback's parameters are correct" );
+                    ok( !callbackCalled, "Our success callback should only be called once" );
+                    callbackCalled = true;
+                },
+                500: function() {
+                    ok( false, "The 500 statusCode handler shouldn't be invoked" );
+                }
+            }
+        });
+    });
+    
+    test( "shouldRetry returning false", function() {
         expect(1);
         
         $.ajax({
             url: "failure",
-            shouldRetry: function() {
-                return false;
-            },
             error: function() {
                 ok( true, "Our error handler should be invoked" );
-            },
-            complete: start
+            }
         });
     });
     
-    asyncTest( "Success (options) arguments - no retry, successful", function() {
+    test( "Success (options) arguments - no retry, successful", function() {
         expect(2);
         
         var callbackCalled = false;
@@ -185,31 +255,27 @@
                 ok( jqXHR.getAllResponseHeaders && textStatus === "success" && data === "success", "Our success callback's parameters are correct" );
                 ok( !callbackCalled, "Our success callback should only be called once" );
                 callbackCalled = true;
-                start();
             }
         });
     });
     
-    asyncTest( "Success (options) arguments - retry, successful", function() {
+    test( "Success (options) arguments - retry, successful", function() {
         expect(2);
         
         var callbackCalled = false;
         
         $.ajax({
             url: "failThenSuccess",
-            shouldRetry: function() {
-                return true;
-            },
+            shouldRetry: true,
             success: function( data, textStatus, jqXHR ) {
                 ok( jqXHR.getAllResponseHeaders && textStatus === "success" && data === "success", "Our success callback's parameters are correct" );
                 ok( !callbackCalled, "Our success callback should only be called once" );
                 callbackCalled = true;
-                start();
             }
         });
     });
     
-    asyncTest( "Done (deferred) arguments - no retry, successful", function() {
+    test( "Done (deferred) arguments - no retry, successful", function() {
         expect(2);
         
         var callbackCalled = false;
@@ -220,29 +286,25 @@
             ok( jqXHR.getAllResponseHeaders && textStatus === "success" && data === "success", "Our success callback's parameters are correct" );
             ok( !callbackCalled, "Our success callback should only be called once" );
             callbackCalled = true;
-            start();
         });
     });
     
-    asyncTest( "Done (deferred) arguments - retry, successful", function() {
+    test( "Done (deferred) arguments - retry, successful", function() {
         expect(2);
         
         var callbackCalled = false;
         
         $.ajax({
             url: "failThenSuccess",
-            shouldRetry: function() {
-                return true;
-            }
+            shouldRetry: true
         }).done(function( data, textStatus, jqXHR ) {
             ok( jqXHR.getAllResponseHeaders && textStatus === "success" && data === "success", "Our success callback's parameters are correct" );
             ok( !callbackCalled, "Our success callback should only be called once" );
             callbackCalled = true;
-            start();
         });
     });
     
-    asyncTest( "Error (options) arguments - no retry, failure", function() {
+    test( "Error (options) arguments - no retry, failure", function() {
         expect(2);
         
         var callbackCalled = false;
@@ -253,31 +315,27 @@
                 ok( jqXHR.getAllResponseHeaders && textStatus === "error" && errorThrown === "error", "Our error callback's parameters are correct" );
                 ok( !callbackCalled, "Our error callback should only be called once" );
                 callbackCalled = true;
-                start();
             }
         });
     });
     
-    asyncTest( "Error (options) arguments - with retry, failure", function() {
+    test( "Error (options) arguments - with retry, failure", function() {
         expect(2);
         
         var callbackCalled = false;
         
         $.ajax({
             url: "failure",
-            shouldRetry: function( jqXHR, retryCount ) {
-                return retryCount === 0;
-            },
+            shouldRetry: 1,
             error: function( jqXHR, textStatus, errorThrown ) {
                 ok( jqXHR.getAllResponseHeaders && textStatus === "error" && errorThrown === "error", "Our error callback's parameters are correct" );
                 ok( !callbackCalled, "Our error callback should only be called once" );
                 callbackCalled = true;
-                start();
             }
         });
     });
     
-    asyncTest( "Fail (deferred) arguments - no retry, failure", function() {
+    test( "Fail (deferred) arguments - no retry, failure", function() {
         expect(2);
         
         var callbackCalled = false;
@@ -288,29 +346,25 @@
             ok( jqXHR.getAllResponseHeaders && textStatus === "error" && errorThrown === "error", "Our error callback's parameters are correct" );
             ok( !callbackCalled, "Our error callback should only be called once" );
             callbackCalled = true;
-            start();
         });
     });
     
-    asyncTest( "Error (deferred) arguments - with retry, failure", function() {
+    test( "Error (deferred) arguments - with retry, failure", function() {
         expect(2);
         
         var callbackCalled = false;
 
         $.ajax({
             url: "failure",
-            shouldRetry: function( jqXHR, retryCount ) {
-                return retryCount === 0;
-            }
+            shouldRetry: 1
         }).fail(function( jqXHR, textStatus, errorThrown ) {
             ok( jqXHR.getAllResponseHeaders && textStatus === "error" && errorThrown === "error", "Our error callback's parameters are correct" );
             ok( !callbackCalled, "Our error callback should only be called once" );
             callbackCalled = true;
-            start();
         });
     });
 
-    asyncTest( "Complete (options) arguments - no retry, successful", function() {
+    test( "Complete (options) arguments - no retry, successful", function() {
         expect(2);
         
         var completeCalled = false;
@@ -321,12 +375,11 @@
                 ok( jqXHR.getAllResponseHeaders && typeof textStatus === "string", "Our complete callback's parameters are correct" );
                 ok( !completeCalled, "Our complete callback should only be called once" );
                 completeCalled = true;
-                start();
             }
         });
     });
 
-    asyncTest( "Complete (options) arguments - no retry, failure", function() {
+    test( "Complete (options) arguments - no retry, failure", function() {
         expect(2);
         var completeCalled = false;
         
@@ -336,51 +389,44 @@
                 ok( jqXHR.getAllResponseHeaders && typeof textStatus === "string", "Our complete callback's parameters are correct" );
                 ok( !completeCalled, "Our complete callback should only be called once" );
                 completeCalled = true;
-                start();
             }
         });
     });
 
-    asyncTest( "Complete (options) arguments - with retry, successful", function() {
+    test( "Complete (options) arguments - with retry, successful", function() {
         expect(2);
         var completeCalled = false;
         
         $.ajax({
             url: "failThenSuccess",
-            shouldRetry: function() {
-                return true;
-            },
+            shouldRetry: true,
             complete: function( jqXHR, textStatus ) {
                 ok( jqXHR.getAllResponseHeaders && typeof textStatus === "string", "Our complete callback's parameters are correct" );
                 ok( !completeCalled, "Our complete callback should only be called once" );
                 completeCalled = true;
-                start();
             }
         });
     });
 
-    asyncTest( "Complete (options) arguments - with retry, failure", function() {
+    test( "Complete (options) arguments - with retry, failure", function() {
         expect(2);
         
         var completeCalled = false;
         
         $.ajax({
             url: "failure",
-            shouldRetry: function( jqXHR, retryCount ) {
-                return retryCount === 0;
-            },
+            shouldRetry: 1,
             complete: function( jqXHR, textStatus ) {
                 ok( jqXHR.getAllResponseHeaders && typeof textStatus === "string", "Our complete callback's parameters are correct" );
                 ok( !completeCalled, "Our complete callback should only be called once" );
                 completeCalled = true;
-                start();
             }
         });
     });
     
     if ( supportsAlways ) {
         
-        asyncTest( "always (Deferred) arguments - no retry, successful", function() {
+        test( "always (Deferred) arguments - no retry, successful", function() {
             expect(2);
             
             var callbackCalled = false;
@@ -391,11 +437,10 @@
                 ok( jqXHR.getAllResponseHeaders && textStatus === "success" && data === "success", "Our success callback's parameters are correct" );
                 ok( !callbackCalled, "Our success callback should only be called once" );
                 callbackCalled = true;
-                start();
             });
         });
 
-        asyncTest( "always (deferred) arguments - no retry, failure", function() {
+        test( "always (deferred) arguments - no retry, failure", function() {
             expect(2);
             var callbackCalled = false;
             
@@ -405,66 +450,54 @@
                 ok( jqXHR.getAllResponseHeaders && textStatus === "error" && errorThrown === "error", "Our error callback's parameters are correct" );
                 ok( !callbackCalled, "Our error callback should only be called once" );
                 callbackCalled = true;
-                start();
             });
         });
 
-        asyncTest( "always (deferred) arguments - with retry, successful", function() {
+        test( "always (deferred) arguments - with retry, successful", function() {
             expect(2);
             var callbackCalled = false;
             
             $.ajax({
                 url: "failThenSuccess",
-                shouldRetry: function() {
-                    return true;
-                }
+                shouldRetry: true
             }).always(function( data, textStatus, jqXHR ) {
                 ok( jqXHR.getAllResponseHeaders && textStatus === "success" && data === "success", "Our success callback's parameters are correct" );
                 ok( !callbackCalled, "Our success callback should only be called once" );
                 callbackCalled = true;
-                start();
             });
         });
 
-        asyncTest( "always (deferred) arguments - with retry, failure", function() {
+        test( "always (deferred) arguments - with retry, failure", function() {
             expect(2);
             
             var callbackCalled = false;
 
             $.ajax({
                 url: "failure",
-                shouldRetry: function( jqXHR, retryCount ) {
-                    return retryCount === 0;
-                }
+                shouldRetry: 1
             }).always(function( jqXHR, textStatus, errorThrown ) {
                 ok( jqXHR.getAllResponseHeaders && textStatus === "error" && errorThrown === "error", "Our error callback's parameters are correct" );
                 ok( !callbackCalled, "Our error callback should only be called once" );
                 callbackCalled = true;
-                start();
             });
         });
     
     }
 
-    asyncTest( "Error handler isn't invoked on successful retry", function() {
+    test( "Error handler isn't invoked on successful retry", function() {
         expect(0);
         
         $.ajax({
             url: "failThenSuccess",
-            shouldRetry: function() {
-                return true;
-            },
+            shouldRetry: true,
             error: function() {
                 ok( false, "Our error handler shouldn't have been invoked" );
-            },
-            complete: function() {
-                start();
             }
         });
     });
     
     if ( supportsLegacyDeferred ) {
-        asyncTest( "Complete (deferred) arguments - no retry, successful", function() {
+        test( "Complete (deferred) arguments - no retry, successful", function() {
             expect(2);
             
             var completeCalled = false;
@@ -475,11 +508,10 @@
                 ok( jqXHR.getAllResponseHeaders && typeof textStatus === "string", "Our complete callback's parameters are correct" );
                 ok( !completeCalled, "Our complete callback should only be called once" );
                 completeCalled = true;
-                start();
             });
         });
 
-        asyncTest( "Complete (deferred) arguments - no retry, failure", function() {
+        test( "Complete (deferred) arguments - no retry, failure", function() {
             expect(2);
             
             var completeCalled = false;
@@ -490,47 +522,40 @@
                 ok( jqXHR.getAllResponseHeaders && typeof textStatus === "string", "Our complete callback's parameters are correct" );
                 ok( !completeCalled, "Our complete callback should only be called once" );
                 completeCalled = true;
-                start();
             });
         });
 
-        asyncTest( "Complete (deferred) arguments - with retry, successful", function() {
+        test( "Complete (deferred) arguments - with retry, successful", function() {
             expect(2);
             
             var completeCalled = false;
             
             $.ajax({
                 url: "failThenSuccess",
-                shouldRetry: function() {
-                    return true;
-                }
+                shouldRetry: true
             }).complete(function( jqXHR, textStatus ) {
                 ok( jqXHR.getAllResponseHeaders && typeof textStatus === "string", "Our complete callback's parameters are correct" );
                 ok( !completeCalled, "Our complete callback should only be called once" );
                 completeCalled = true;
-                start();
             });
         });
 
-        asyncTest( "Complete (deferred) arguments - with retry, failure", function() {
+        test( "Complete (deferred) arguments - with retry, failure", function() {
             expect(2);
             
             var completeCalled = false;
 
             $.ajax({
                 url: "failure",
-                shouldRetry: function( jqXHR, retryCount ) {
-                    return retryCount === 0;
-                }
+                shouldRetry: 1
             }).complete(function( jqXHR, textStatus ) {
                 ok( jqXHR.getAllResponseHeaders && typeof textStatus === "string", "Our complete callback's parameters are correct" );
                 ok( !completeCalled, "Our complete callback should only be called once" );
                 completeCalled = true;
-                start();
             });
         });
         
-        asyncTest( "Success (deferred) arguments - no retry, successful", function() {
+        test( "Success (deferred) arguments - no retry, successful", function() {
             expect(2);
             
             var callbackCalled = false;
@@ -541,29 +566,25 @@
                 ok( jqXHR.getAllResponseHeaders && textStatus === "success" && data === "success", "Our success callback's parameters are correct" );
                 ok( !callbackCalled, "Our success callback should only be called once" );
                 callbackCalled = true;
-                start();
             });
         });
         
-        asyncTest( "Success (deferred) arguments - retry, successful", function() {
+        test( "Success (deferred) arguments - retry, successful", function() {
             expect(2);
             
             var callbackCalled = false;
             
             $.ajax({
                 url: "failThenSuccess",
-                shouldRetry: function() {
-                    return true;
-                }
+                shouldRetry: true
             }).success(function( data, textStatus, jqXHR ) {
                 ok( jqXHR.getAllResponseHeaders && textStatus === "success" && data === "success", "Our success callback's parameters are correct" );
                 ok( !callbackCalled, "Our success callback should only be called once" );
                 callbackCalled = true;
-                start();
             });
         });
         
-        asyncTest( "Error (deferred) arguments - no retry, failure", function() {
+        test( "Error (deferred) arguments - no retry, failure", function() {
             expect(2);
             
             var callbackCalled = false;
@@ -574,25 +595,21 @@
                 ok( jqXHR.getAllResponseHeaders && textStatus === "error" && errorThrown === "error", "Our error callback's parameters are correct" );
                 ok( !callbackCalled, "Our error callback should only be called once" );
                 callbackCalled = true;
-                start();
             });
         });
         
-        asyncTest( "Error (deferred) arguments - with retry, failure", function() {
+        test( "Error (deferred) arguments - with retry, failure", function() {
             expect(2);
             
             var callbackCalled = false;
 
             $.ajax({
                 url: "failure",
-                shouldRetry: function( jqXHR, retryCount ) {
-                    return retryCount === 0;
-                }
+                shouldRetry: 1
             }).error(function( jqXHR, textStatus, errorThrown ) {
                 ok( jqXHR.getAllResponseHeaders && textStatus === "error" && errorThrown === "error", "Our error callback's parameters are correct" );
                 ok( !callbackCalled, "Our error callback should only be called once" );
                 callbackCalled = true;
-                start();
             });
         });
     }
