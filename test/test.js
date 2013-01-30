@@ -262,17 +262,11 @@
         expect(2);
         
         var callbackCalled = false;
-        var retried = false;
         
         $.ajax({
             url: "failure",
-            shouldRetry: function() {
-                if ( retried ) {
-                    return false;
-                }
-                
-                retried = true;
-                return true;
+            shouldRetry: function( jqXHR, retryCount ) {
+                return retryCount === 0;
             },
             error: function( jqXHR, textStatus, errorThrown ) {
                 ok( jqXHR.getAllResponseHeaders && textStatus === "error" && errorThrown === "error", "Our error callback's parameters are correct" );
@@ -302,17 +296,11 @@
         expect(2);
         
         var callbackCalled = false;
-        var retried = false;
-        
+
         $.ajax({
             url: "failure",
-            shouldRetry: function() {
-                if ( retried ) {
-                    return false;
-                }
-                
-                retried = true;
-                return true;
+            shouldRetry: function( jqXHR, retryCount ) {
+                return retryCount === 0;
             }
         }).fail(function( jqXHR, textStatus, errorThrown ) {
             ok( jqXHR.getAllResponseHeaders && textStatus === "error" && errorThrown === "error", "Our error callback's parameters are correct" );
@@ -375,16 +363,11 @@
         expect(2);
         
         var completeCalled = false;
-        var retried = false;
+        
         $.ajax({
             url: "failure",
-            shouldRetry: function() {
-                if ( retried ) {
-                    return false;
-                }
-                
-                retried = true;
-                return true;
+            shouldRetry: function( jqXHR, retryCount ) {
+                return retryCount === 0;
             },
             complete: function( jqXHR, textStatus ) {
                 ok( jqXHR.getAllResponseHeaders && typeof textStatus === "string", "Our complete callback's parameters are correct" );
@@ -447,16 +430,11 @@
             expect(2);
             
             var callbackCalled = false;
-            var retried = false;
+
             $.ajax({
                 url: "failure",
-                shouldRetry: function() {
-                    if ( retried ) {
-                        return false;
-                    }
-                    
-                    retried = true;
-                    return true;
+                shouldRetry: function( jqXHR, retryCount ) {
+                    return retryCount === 0;
                 }
             }).always(function( jqXHR, textStatus, errorThrown ) {
                 ok( jqXHR.getAllResponseHeaders && textStatus === "error" && errorThrown === "error", "Our error callback's parameters are correct" );
@@ -538,16 +516,11 @@
             expect(2);
             
             var completeCalled = false;
-            var retried = false;
+
             $.ajax({
                 url: "failure",
-                shouldRetry: function() {
-                    if ( retried ) {
-                        return false;
-                    }
-                    
-                    retried = true;
-                    return true;
+                shouldRetry: function( jqXHR, retryCount ) {
+                    return retryCount === 0;
                 }
             }).complete(function( jqXHR, textStatus ) {
                 ok( jqXHR.getAllResponseHeaders && typeof textStatus === "string", "Our complete callback's parameters are correct" );
@@ -609,17 +582,11 @@
             expect(2);
             
             var callbackCalled = false;
-            var retried = false;
-            
+
             $.ajax({
                 url: "failure",
-                shouldRetry: function() {
-                    if ( retried ) {
-                        return false;
-                    }
-                    
-                    retried = true;
-                    return true;
+                shouldRetry: function( jqXHR, retryCount ) {
+                    return retryCount === 0;
                 }
             }).error(function( jqXHR, textStatus, errorThrown ) {
                 ok( jqXHR.getAllResponseHeaders && textStatus === "error" && errorThrown === "error", "Our error callback's parameters are correct" );
