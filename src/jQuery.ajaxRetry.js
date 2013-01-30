@@ -1,4 +1,6 @@
 (function( $, undefined ) {
+    "use strict";
+    
     var retryKey = "__RETRY__";
     
     function returnFalse() {
@@ -44,7 +46,7 @@
                 if ( willRetry === true ) {
                     $.ajax( options ).then(
                         function( data, textStatus, jqXHR ) {
-                            dfr.resolveWith( this, arguments );console.log( arguments );
+                            dfr.resolveWith( this, arguments );
                             jqXHR.statusCode( statusCode );
                             completeDeferred.resolveWith( this, [ jqXHR, textStatus ]);
                         },
@@ -53,7 +55,7 @@
                                 failureContext = this;
                             
                             retryRequest( options, jqXHR ).done(function( willRetry ) {
-                                if ( !willRetry ) {console.log(1);
+                                if ( !willRetry ) {
                                     dfr.rejectWith( failureContext, failureArgs );
                                     jqXHR.statusCode( statusCode );
                                     completeDeferred.resolveWith( failureContext, [ jqXHR, textStatus ]);

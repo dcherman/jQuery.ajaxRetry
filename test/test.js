@@ -1,4 +1,4 @@
-/*globals module:false, test:false, ok:false, expect:false, asyncTest:false, start:false, jqVersion:false, strictEqual:false */
+/*global module:false, test:false, ok:false, expect:false, asyncTest:false, start:false, jqVersion:false */
 
 (function() {
     var supportMock = $.mockjax({
