@@ -20,7 +20,8 @@
         completeDeferred.done( options.complete );
 
         // Completely obliterate the original request state handlers since we want to handle them manually.
-        options.success = options.error = options.complete = originalOptions.success = originalOptions.error = originalOptions.complete = undefined;
+        options.success = options.error = options.complete = originalOptions.success =
+            originalOptions.error = originalOptions.complete = undefined;
         
         statusCode = originalOptions.statusCode;
         
@@ -86,7 +87,8 @@
             }
         );
         
-        // Install legacy deferred style functions.  These are deprecated, and presumably will be removed as a group at some point.
+        // Install legacy deferred style functions.  These are deprecated,
+        // and presumably will be removed as a group at some point.
         // To maintain API compatibility, first check if we should even install these.
         if ( jqXHR.complete ) {
             jqXHR.complete = completeDeferred.done;
@@ -94,8 +96,9 @@
             jqXHR.error = dfr.fail;
         }
         
-        // Override the promise methods on the jqXHR.  Don't use the .promise(obj) syntax here since that wasn't introduced until 1.6.
-        // By using $.extend, we can support 1.5 as well - nothing else needs to change.
+        // Override the promise methods on the jqXHR.  Don't use the .promise(obj) syntax
+        // here since that wasn't introduced until 1.6. By using $.extend,
+        // we can support 1.5 as well - nothing else needs to change.
         $.extend( jqXHR, dfr.promise() );
     });
 }( jQuery ));
