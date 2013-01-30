@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>jQuery Ajax Retry Prefilter Test</title>
+        <link rel="stylesheet" href="qunit-1.10.0.css">
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+        <script src="qunit-1.10.0.js"></script>
+        <script>
+            var specifiedVersion = location.search.match( /\d\.\d(?:\.\d)?/ ) || [];
+            var jqVersion = specifiedVersion[0] || "1.8.3";
+            document.write( "<scri" + "pt src='jquery-" + jqVersion + ".js'></scri" + "pt>" );
+        </script>
+        <script src="jquery.mockjax.js"></script>
+        <script src="../src/jQuery.ajaxRetry.js"></script>
+        <script src="test.js"></script>
+    </body>
+</html>
