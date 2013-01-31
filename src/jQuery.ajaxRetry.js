@@ -1,7 +1,7 @@
 (function( $, undefined ) {
     "use strict";
     
-    var retryKey = "__RETRY__";
+    var retryKey = "__RETRY__" + new Date().getTime();
 
     $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
         // Don't handle a call that's already "fixed" or that doesn't specify a shouldRetry option
