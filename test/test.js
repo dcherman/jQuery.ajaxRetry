@@ -57,11 +57,10 @@
         }
     });
 
-
     test( "jQuery Version", function() {
         expect(1);
         
-        ok( jQuery.fn.jquery === jqVersion, "The correct version of jQuery is being tested" );
+        ok( jQuery.fn.jquery === jqVersion, "The correct version of jQuery ( " + jqVersion + " ) is being tested" );
     });
     
     test( "shouldRetry - boolean ( true )", function() {

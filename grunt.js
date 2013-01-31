@@ -22,7 +22,7 @@ module.exports = function( grunt ) {
         watch: {
             dev: {
               files: '<config:lint.all>',
-              tasks: 'lint qunit:quick'
+              tasks: 'lint qunit'
             }
         },
         lint: {
@@ -39,8 +39,7 @@ module.exports = function( grunt ) {
             }
         },
         qunit: {
-            all: [ "test/master.html" ],
-            quick: [ "test/qunit.html" ]
+            all: [ "test/master.html" ]
         },
         server: {
             port: 8001,

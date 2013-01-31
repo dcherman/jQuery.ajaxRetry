@@ -4,8 +4,8 @@
     var retryKey = "__RETRY__";
 
     $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
-        // Don't handle a call that's already "fixed".
-        if ( options[retryKey] ) {
+        // Don't handle a call that's already "fixed" or that doesn't specify a shouldRetry option
+        if ( options[retryKey] || typeof options.shouldRetry === "undefined" ) {
             return;
         }
         
@@ -16,8 +16,8 @@
         originalOptions.retryCount = 0;
 
         var dfr = $.Deferred(),
+            statusCodes = originalOptions.statusCode || {},
             completeDeferred = $.Deferred(),
-            statusCode = originalOptions.statusCode,
             shouldRetry = function( jqXHR, retryCount ) {
                 var result,
                     test = originalOptions.shouldRetry,
@@ -42,28 +42,34 @@
         completeDeferred.done( options.complete );
 
         // Completely obliterate the original request state handlers since we want to handle them manually.
+        // Also get rid of the statusCode handler since we're going to handle that manually as well.
         options.success = options.error = options.complete = originalOptions.success =
-            originalOptions.error = originalOptions.complete = options.statusCode = originalOptions.statusCode = undefined;
-
-        function retryRequest( options, lastJqXHR ) {
+            originalOptions.error = originalOptions.complete = jqXHR.statusCode = $.noop;
+            
+        var newOptions = $.extend({}, originalOptions );
+        newOptions.statusCode = {};
+        
+        (function tryRequest( options, lastJqXHR ) {
             var willRetryDeferred = $.Deferred();
             
-            shouldRetry( lastJqXHR, options.retryCount++ ).done(function( willRetry ) {
+            // If lastJqXHR === undefined at this point, then it's the first ever request.
+            // Ensure that we always proceed without calling the shouldRetry function in that case
+            ( !lastJqXHR ? $.when(true) : shouldRetry(lastJqXHR, options.retryCount++) ).done(function( willRetry ) {
                 if ( willRetry === true ) {
-                    $.ajax( options ).then(
+                    (!lastJqXHR ? jqXHR : $.ajax(options) ).then(
                         function( data, textStatus, jqXHR ) {
                             dfr.resolveWith( this, arguments );
-                            jqXHR.statusCode( statusCode );
+                            dfr.done( statusCodes[jqXHR.status] );
                             completeDeferred.resolveWith( this, [ jqXHR, textStatus ]);
                         },
                         function( jqXHR, textStatus ) {
                             var failureArgs = arguments,
                                 failureContext = this;
                             
-                            retryRequest( options, jqXHR ).done(function( willRetry ) {
-                                if ( !willRetry ) {
+                            tryRequest( options, jqXHR ).done(function( willRetry ) {
+                                if ( willRetry !== true ) {
                                     dfr.rejectWith( failureContext, failureArgs );
-                                    jqXHR.statusCode( statusCode );
+                                    dfr.fail( statusCodes[jqXHR.status] );
                                     completeDeferred.resolveWith( failureContext, [ jqXHR, textStatus ]);
                                 }
                             });
@@ -75,25 +81,7 @@
             });
  
             return willRetryDeferred.promise();
-        }
-        
-        jqXHR.then(
-            function( data, textStatus, jqXHR ) {
-                dfr.resolveWith( this, arguments );
-                completeDeferred.resolveWith( this, [ jqXHR, textStatus ]);
-            },
-            function( jqXHR, textStatus ) {
-                var failureContext = this,
-                    failureArgs = arguments;
-                    
-                retryRequest( originalOptions, jqXHR ).done(function( willRetry ) {
-                    if ( willRetry !== true ) {
-                        dfr.rejectWith( failureContext, failureArgs );
-                        completeDeferred.resolveWith( failureContext, [ jqXHR, textStatus ]);
-                    }
-                });
-            }
-        );
+        }( newOptions ));
         
         // Install legacy deferred style functions.  These are deprecated,
         // and presumably will be removed as a group at some point.
@@ -105,8 +93,7 @@
         }
         
         // Override the promise methods on the jqXHR.  Don't use the .promise(obj) syntax
-        // here since that wasn't introduced until 1.6. By using $.extend,
-        // we can support 1.5 as well - nothing else needs to change.
+        // here since that wasn't introduced until 1.6.
         $.extend( jqXHR, dfr.promise() );
     });
 }( jQuery ));
