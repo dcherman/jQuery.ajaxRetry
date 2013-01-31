@@ -12,6 +12,14 @@
         <script>
             var specifiedVersion = location.search.match( /\d\.\d(?:\.\d)?/ ) || [];
             var jqVersion = specifiedVersion[0] || "1.9.0";
+            var gitVersion = /git/.test( location.search );
+            
+            if ( gitVersion ) {
+                document.write( "<scri" + "pt src='http://code.jquery.com/jquery-git.js'></scri" + "pt>" );
+            } else {
+                document.write( "<scri" + "pt src='jquery-" + jqVersion + ".js'></scri" + "pt>" );
+            }
+            
             document.write( "<scri" + "pt src='jquery-" + jqVersion + ".js'></scri" + "pt>" );
             
             // Hide some console.log messages from mockjax because damnit, they're annoying and I don't need to see them.
