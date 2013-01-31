@@ -202,6 +202,9 @@
 
         $.ajax({
             url: "failure",
+            shouldRetry: function() {
+                return false;
+            },
             statusCode: {
                 500: function( jqXHR, textStatus, errorThrown ) {
                     ok( jqXHR.getAllResponseHeaders && textStatus === "error" && errorThrown === "error", "Our error callback's parameters are correct" );
@@ -237,6 +240,9 @@
         
         $.ajax({
             url: "failure",
+            shouldRetry: function() {
+                return false;
+            },
             error: function() {
                 ok( true, "Our error handler should be invoked" );
             }
@@ -250,6 +256,9 @@
         
         $.ajax({
             url: "success",
+            shouldRetry: function() {
+                return false;
+            },
             success: function( data, textStatus, jqXHR ) {
                 ok( jqXHR.getAllResponseHeaders && textStatus === "success" && data === "success", "Our success callback's parameters are correct" );
                 ok( !callbackCalled, "Our success callback should only be called once" );
@@ -280,7 +289,10 @@
         var callbackCalled = false;
         
         $.ajax({
-            url: "success"
+            url: "success",
+            shouldRetry: function() {
+                return false;
+            }
         }).done(function( data, textStatus, jqXHR ) {
             ok( jqXHR.getAllResponseHeaders && textStatus === "success" && data === "success", "Our success callback's parameters are correct" );
             ok( !callbackCalled, "Our success callback should only be called once" );
@@ -340,7 +352,10 @@
         var callbackCalled = false;
         
         $.ajax({
-            url: "failure"
+            url: "failure",
+            shouldRetry: function() {
+                return false;
+            }
         }).fail(function( jqXHR, textStatus, errorThrown ) {
             ok( jqXHR.getAllResponseHeaders && textStatus === "error" && errorThrown === "error", "Our error callback's parameters are correct" );
             ok( !callbackCalled, "Our error callback should only be called once" );
@@ -370,6 +385,9 @@
         
         $.ajax({
             url: "success",
+            shouldRetry: function() {
+                return false;
+            },
             complete: function( jqXHR, textStatus ) {
                 ok( jqXHR.getAllResponseHeaders && typeof textStatus === "string", "Our complete callback's parameters are correct" );
                 ok( !completeCalled, "Our complete callback should only be called once" );
@@ -384,6 +402,9 @@
         
         $.ajax({
             url: "failure",
+            shouldRetry: function() {
+                return false;
+            },
             complete: function( jqXHR, textStatus ) {
                 ok( jqXHR.getAllResponseHeaders && typeof textStatus === "string", "Our complete callback's parameters are correct" );
                 ok( !completeCalled, "Our complete callback should only be called once" );
@@ -431,7 +452,10 @@
             var callbackCalled = false;
             
             $.ajax({
-                url: "success"
+                url: "success",
+                shouldRetry: function() {
+                    return false;
+                }
             }).always(function( data, textStatus, jqXHR ) {
                 ok( jqXHR.getAllResponseHeaders && textStatus === "success" && data === "success", "Our success callback's parameters are correct" );
                 ok( !callbackCalled, "Our success callback should only be called once" );
@@ -444,7 +468,10 @@
             var callbackCalled = false;
             
             $.ajax({
-                url: "failure"
+                url: "failure",
+                shouldRetry: function() {
+                    return false;
+                }
             }).always(function( jqXHR, textStatus, errorThrown ) {
                 ok( jqXHR.getAllResponseHeaders && textStatus === "error" && errorThrown === "error", "Our error callback's parameters are correct" );
                 ok( !callbackCalled, "Our error callback should only be called once" );
@@ -502,7 +529,10 @@
             var completeCalled = false;
             
             $.ajax({
-                url: "success"
+                url: "success",
+                shouldRetry: function() {
+                    return false;
+                }
             }).complete(function( jqXHR, textStatus ) {
                 ok( jqXHR.getAllResponseHeaders && typeof textStatus === "string", "Our complete callback's parameters are correct" );
                 ok( !completeCalled, "Our complete callback should only be called once" );
@@ -516,7 +546,10 @@
             var completeCalled = false;
             
             $.ajax({
-                url: "failure"
+                url: "failure",
+                shouldRetry: function() {
+                    return false;
+                }
             }).complete(function( jqXHR, textStatus ) {
                 ok( jqXHR.getAllResponseHeaders && typeof textStatus === "string", "Our complete callback's parameters are correct" );
                 ok( !completeCalled, "Our complete callback should only be called once" );
@@ -560,7 +593,10 @@
             var callbackCalled = false;
             
             $.ajax({
-                url: "success"
+                url: "success",
+                shouldRetry: function() {
+                    return false;
+                }
             }).success(function( data, textStatus, jqXHR ) {
                 ok( jqXHR.getAllResponseHeaders && textStatus === "success" && data === "success", "Our success callback's parameters are correct" );
                 ok( !callbackCalled, "Our success callback should only be called once" );
@@ -589,7 +625,10 @@
             var callbackCalled = false;
             
             $.ajax({
-                url: "failure"
+                url: "failure",
+                shouldRetry: function() {
+                    return false;
+                }
             }).error(function( jqXHR, textStatus, errorThrown ) {
                 ok( jqXHR.getAllResponseHeaders && textStatus === "error" && errorThrown === "error", "Our error callback's parameters are correct" );
                 ok( !callbackCalled, "Our error callback should only be called once" );
