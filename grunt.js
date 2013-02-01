@@ -18,6 +18,8 @@ module.exports = function( grunt ) {
         };
     }
     
+    var jQueryManifest = grunt.file.readJSON( "manifest.jquery.json" );
+    
     grunt.initConfig({
         watch: {
             dev: {
@@ -35,7 +37,7 @@ module.exports = function( grunt ) {
         min: {
             dist: {
                 src: [ "src/jQuery.ajaxRetry.js" ],
-                dest: "dist/jQuery.ajaxRetry.min.js"
+                dest: "dist/" + jQueryManifest.version + "/jQuery.ajaxRetry.min.js"
             }
         },
         qunit: {
