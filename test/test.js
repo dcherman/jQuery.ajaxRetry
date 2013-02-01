@@ -56,11 +56,34 @@
             });
         }
     });
-
-    test( "jQuery Version", function() {
+    
+    
+    // Don't assert the version of jQuery in git.  It's always changing, and we don't want to have to keep this up to date.
+    if ( !gitVersion ) {
+        test( "jQuery Version", function() {
+            expect(1);
+            
+            ok( jQuery.fn.jquery === jqVersion, "The correct version of jQuery ( " + jqVersion + " ) is being tested" );
+        });
+    }
+    
+    test( "shouldRetry - arguments", function() {
         expect(1);
         
-        ok( jQuery.fn.jquery === jqVersion, "The correct version of jQuery ( " + jqVersion + " ) is being tested" );
+        $.ajax({
+            url: "failThenSuccess",
+            shouldRetry: function( jqXHR, retryCount, type ) {
+                ok( jqXHR.getAllResponseHeaders && retryCount === 0 && type === "GET", "Our parameters are correct" );
+            }
+        });
+        
+        $.ajax({
+            url: "failThenSuccess",
+            type: "POST",
+            shouldRetry: function( jqXHR, retryCount, type ) {
+                ok( jqXHR.getAllResponseHeaders && retryCount === 0 && type === "POST", "Our parameters are correct" );
+            }
+        });
     });
     
     test( "shouldRetry - boolean ( true )", function() {

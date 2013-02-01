@@ -11,18 +11,30 @@
         
         // Mark this as having been processed so the prefilter doesn't touch subsequent retried requests
         originalOptions[ retryKey ] = true;
-        
-        // We haven't retried anything yet, so start us out at 0;
-        originalOptions.retryCount = 0;
 
-        var dfr = $.Deferred(),
-            statusCodes = originalOptions.statusCode || {},
+        var
+            // A deferred that will be resolved to satisfy the success, error, done, fail, and always handlers and deferreds
+            dfr = $.Deferred(),
+            
+            // A deferred that'll be resolved to satisy the complete handler and deferred
             completeDeferred = $.Deferred(),
-            shouldRetry = function( jqXHR, retryCount ) {
+            
+            // Any status code specific callbacks that should be invoked
+            statusCodes = originalOptions.statusCode || {},
+            
+            // The number of times our request has been retried thus far
+            retryCount = 0,
+            
+            // The options that'll be passed to our ajax handler if a retry is needed
+            newOptions,
+            
+            // Returns either a boolean or a promise that'll be resolved with a boolean to determine
+            // whether or not we should retry a given request.
+            shouldRetry = function( jqXHR, retryCount, method ) {
                 var result,
                     test = originalOptions.shouldRetry,
                     type = typeof test;
-                    
+
                 switch( type ) {
                     case "number":
                         result = retryCount < test;
@@ -31,7 +43,7 @@
                         result = test;
                         break;
                     case "function":
-                        result = test( jqXHR, retryCount );
+                        result = test( jqXHR, retryCount, method );
                         break;
                 }
 
@@ -46,7 +58,7 @@
         options.success = options.error = options.complete = originalOptions.success =
             originalOptions.error = originalOptions.complete = jqXHR.statusCode = $.noop;
             
-        var newOptions = $.extend({}, originalOptions );
+        newOptions = $.extend({}, originalOptions );
         newOptions.statusCode = {};
         
         (function tryRequest( options, lastJqXHR ) {
@@ -54,7 +66,7 @@
             
             // If lastJqXHR === undefined at this point, then it's the first ever request.
             // Ensure that we always proceed without calling the shouldRetry function in that case
-            ( !lastJqXHR ? $.when(true) : shouldRetry(lastJqXHR, options.retryCount++) ).done(function( willRetry ) {
+            ( !lastJqXHR ? $.when(true) : shouldRetry(lastJqXHR, retryCount++, options.type || "GET") ).done(function( willRetry ) {
                 if ( willRetry === true ) {
                     (!lastJqXHR ? jqXHR : $.ajax(options) ).then(
                         function( data, textStatus, jqXHR ) {
