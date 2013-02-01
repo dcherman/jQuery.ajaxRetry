@@ -1,13 +1,13 @@
 {
-    "name": "jQuery.AjaxRetry",
-    "title": "jQuery.AjaxRetry",
+    "name": "jquery.ajaxRetry",
+    "title": "jquery.ajaxRetry",
     "description": "An ajaxPrefilter that adds the capability to have advanced retry logic for ajax calls",
     "keywords": [
         "ajax",
         "jquery",
         "retry"
     ],
-    "version": "0.1.1",
+    "version": "0.1.2",
     "author": {
         "name": "Daniel Herman"
     },
