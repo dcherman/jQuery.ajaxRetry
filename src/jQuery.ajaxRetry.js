@@ -1,4 +1,5 @@
-(function( $, undefined ) {
+/*! jQuery.ajaxRetry v0.1 | (c) 2013 Daniel Herman | opensource.org/licenses/MIT */
+(function( $ ) {
     "use strict";
     
     var retryKey = "__RETRY__" + new Date().getTime();
