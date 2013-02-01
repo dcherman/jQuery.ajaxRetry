@@ -1,0 +1,25 @@
+{
+    "name": "jQuery.AjaxRetry",
+    "title": "jQuery.AjaxRetry",
+    "description": "An ajaxPrefilter that adds the capability to have advanced retry logic for ajax calls",
+    "keywords": [
+        "ajax",
+        "jquery",
+        "retry"
+    ],
+    "version": "0.1",
+    "author": "Daniel Herman",
+    "licenses": [
+        {
+            "type": "MIT",
+            "url": "http://opensource.org/licenses/MIT"
+        }
+    ],
+    "bugs": "https://github.com/dcherman/jQuery.ajaxRetry/issues",
+    "homepage": "https://github.com/dcherman/jQuery.ajaxRetry",
+    "docs": "https://github.com/dcherman/jQuery.ajaxRetry",
+    "download": "https://github.com/dcherman/jQuery.ajaxRetry",
+    "dependencies": {
+        "jquery": ">=1.5"
+    }
+}
