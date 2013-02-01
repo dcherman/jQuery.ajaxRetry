@@ -1,6 +1,6 @@
 {
-    "name": "AjaxRetry",
-    "title": "jQuery AjaxRetry",
+    "name": "jQuery.AjaxRetry",
+    "title": "jQuery.AjaxRetry",
     "description": "An ajaxPrefilter that adds the capability to have advanced retry logic for ajax calls",
     "keywords": [
         "ajax",
@@ -18,7 +18,7 @@
     "bugs": "https://github.com/dcherman/jQuery.ajaxRetry/issues",
     "homepage": "https://github.com/dcherman/jQuery.ajaxRetry",
     "docs": "https://github.com/dcherman/jQuery.ajaxRetry",
-    "download": "http://code.jquery.com/#color",
+    "download": "https://github.com/dcherman/jQuery.ajaxRetry",
     "dependencies": {
         "jquery": ">=1.5"
     }
