@@ -219,6 +219,43 @@
         });
     });
     
+    test( "statusCode ( deferred ) - no retry, successful", function() {
+        expect(2);
+        var callbackCalled = false;
+        
+        $.ajax({
+            url: "success"
+        }).statusCode({
+            200: function( data, textStatus, jqXHR ) {
+                ok( jqXHR.getAllResponseHeaders && textStatus === "success" && data === "success", "Our success callback's parameters are correct" );
+                ok( !callbackCalled, "Our success callback should only be called once" );
+                callbackCalled = true;
+            },
+            500: function() {
+                ok( false, "The 500 statusCode handler shouldn't be invoked" );
+            }
+        });
+    });
+    
+    test( "statusCode ( deferred ) - with retry, successful", function() {
+        expect(2);
+        var callbackCalled = false;
+        
+        $.ajax({
+            url: "failThenSuccess",
+            shouldRetry: true
+        }).statusCode({
+            200: function( data, textStatus, jqXHR ) {
+                ok( jqXHR.getAllResponseHeaders && textStatus === "success" && data === "success", "Our success callback's parameters are correct" );
+                ok( !callbackCalled, "Our success callback should only be called once" );
+                callbackCalled = true;
+            },
+            500: function() {
+                ok( false, "The 500 statusCode handler shouldn't be invoked" );
+            }
+        });
+    });
+    
     test( "statusCode - without retry, failure", function() {
         expect(2);
         var callbackCalled = false;
@@ -254,6 +291,43 @@
                 500: function() {
                     ok( false, "The 500 statusCode handler shouldn't be invoked" );
                 }
+            }
+        });
+    });
+    
+    test( "statusCode (deferred) - without retry, failure", function() {
+        expect(2);
+        var callbackCalled = false;
+
+        $.ajax({
+            url: "failure",
+            shouldRetry: function() {
+                return false;
+            }
+        }).statusCode({
+            500: function( jqXHR, textStatus, errorThrown ) {
+                ok( jqXHR.getAllResponseHeaders && textStatus === "error" && errorThrown === "error", "Our error callback's parameters are correct" );
+                ok( !callbackCalled, "Our error callback should only be called once" );
+                callbackCalled = true;
+            }
+        });
+    });
+    
+    test( "statusCode (deferred) - with retry, successful", function() {
+        expect(2);
+        var callbackCalled = false;
+
+        $.ajax({
+            url: "failThenSuccess",
+            shouldRetry: true
+        }).statusCode({
+            200: function( data, textStatus, jqXHR ) {
+                ok( jqXHR.getAllResponseHeaders && textStatus === "success" && data === "success", "Our success callback's parameters are correct" );
+                ok( !callbackCalled, "Our success callback should only be called once" );
+                callbackCalled = true;
+            },
+            500: function() {
+                ok( false, "The 500 statusCode handler shouldn't be invoked" );
             }
         });
     });

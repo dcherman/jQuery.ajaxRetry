@@ -3,6 +3,14 @@
     "use strict";
     
     var retryKey = "__RETRY__" + new Date().getTime();
+    
+    function isPromiseResolved( promise ) {
+        if ( promise.state ) {
+            return promise.state() !== "pending";
+        } else {
+            return promise.isResolved() || promise.isRejected();
+        }
+    }
 
     $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
         // Don't handle a call that's already "fixed" or that doesn't specify a shouldRetry option
@@ -21,13 +29,16 @@
             completeDeferred = $.Deferred(),
             
             // Any status code specific callbacks that should be invoked
-            statusCodes = originalOptions.statusCode || {},
+            statusCode = {},
             
             // The number of times our request has been retried thus far
             retryCount = 0,
             
             // The options that'll be passed to our ajax handler if a retry is needed
             newOptions,
+            
+            // When the request finally completes, this will be the statusCode that the XHR returned
+            finalStatusCode,
             
             // Returns either a boolean or a promise that'll be resolved with a boolean to determine
             // whether or not we should retry a given request.
@@ -55,13 +66,12 @@
         completeDeferred.done( options.complete );
 
         // Completely obliterate the original request state handlers since we want to handle them manually.
-        // Also get rid of the statusCode handler since we're going to handle that manually as well.
         options.success = options.error = options.complete = originalOptions.success =
-            originalOptions.error = originalOptions.complete = jqXHR.statusCode = $.noop;
+            originalOptions.error = originalOptions.complete = $.noop;
             
         newOptions = $.extend({}, originalOptions );
         newOptions.statusCode = {};
-        
+
         (function tryRequest( options, lastJqXHR ) {
             var willRetryDeferred = $.Deferred();
             
@@ -71,8 +81,9 @@
                 if ( willRetry === true ) {
                     (!lastJqXHR ? jqXHR : $.ajax(options) ).then(
                         function( data, textStatus, jqXHR ) {
+                            finalStatusCode = jqXHR.status;
                             dfr.resolveWith( this, arguments );
-                            dfr.done( statusCodes[jqXHR.status] );
+                            dfr.done( statusCode[finalStatusCode] );
                             completeDeferred.resolveWith( this, [ jqXHR, textStatus ]);
                         },
                         function( jqXHR, textStatus ) {
@@ -81,8 +92,9 @@
                             
                             tryRequest( options, jqXHR ).done(function( willRetry ) {
                                 if ( willRetry !== true ) {
+                                    finalStatusCode = jqXHR.status;
                                     dfr.rejectWith( failureContext, failureArgs );
-                                    dfr.fail( statusCodes[jqXHR.status] );
+                                    dfr.fail( statusCode[finalStatusCode] );
                                     completeDeferred.resolveWith( failureContext, [ jqXHR, textStatus ]);
                                 }
                             });
@@ -108,5 +120,23 @@
         // Override the promise methods on the jqXHR.  Don't use the .promise(obj) syntax
         // here since that wasn't introduced until 1.6.
         $.extend( jqXHR, dfr.promise() );
+        
+        jqXHR.statusCode = function( map ) {
+            var code;
+            
+            if ( map ) {
+                if ( isPromiseResolved(dfr) ) {
+                    // Execute the appropriate callbacks.  Don't use .always() since it's not 1.5 compatible.
+                    dfr.then( map[finalStatusCode], map[finalStatusCode] );
+                } else {
+                    for ( code in map ) {
+                        // Lazy-add the new callback in a way that preserves old ones
+                        statusCode[ code ] = [ statusCode[ code ], map[ code ] ];
+                    }
+                }
+            }
+            
+            return this;
+        };
     });
 }( jQuery ));
