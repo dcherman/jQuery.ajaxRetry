@@ -18,7 +18,7 @@ module.exports = function( grunt ) {
         };
     }
     
-    var jQueryManifest = grunt.file.readJSON( "manifest.jquery.json" );
+    var jQueryManifest = grunt.file.readJSON( "jquery.ajaxRetry.jquery.json" );
     
     grunt.initConfig({
         watch: {

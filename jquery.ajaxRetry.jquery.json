@@ -7,8 +7,10 @@
         "jquery",
         "retry"
     ],
-    "version": "0.1",
-    "author": "Daniel Herman",
+    "version": "0.1.0",
+    "author": {
+        "name": "Daniel Herman"
+    },
     "licenses": [
         {
             "type": "MIT",
