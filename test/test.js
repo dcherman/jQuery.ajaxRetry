@@ -67,6 +67,23 @@
         });
     }
     
+    test( "shouldRetry - ajaxSetup", function() {
+        expect(1);
+        
+        $.ajaxSetup({
+            shouldRetry: function() {
+                ok( true, "shouldRetry should be invoked when set via $.ajaxSetup" );
+                return false;
+            }
+        });
+        
+        $.ajax({
+            url: "failure"
+        });
+        
+        delete $.ajaxSettings.shouldRetry;
+    });
+    
     test( "shouldRetry - arguments", function() {
         expect(1);
         
