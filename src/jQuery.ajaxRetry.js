@@ -44,7 +44,7 @@
             // whether or not we should retry a given request.
             shouldRetry = function( jqXHR, retryCount, method ) {
                 var result,
-                    test = originalOptions.shouldRetry,
+                    test = options.shouldRetry,
                     type = typeof test;
 
                 switch( type ) {
