@@ -61,16 +61,13 @@
 
                 return $.when( result );
             };
-        
-        dfr.then( options.success, options.error );
-        completeDeferred.done( options.complete );
-
-        // Completely obliterate the original request state handlers since we want to handle them manually.
-        options.success = options.error = options.complete = originalOptions.success =
-            originalOptions.error = originalOptions.complete = $.noop;
             
-        newOptions = $.extend({}, originalOptions );
-        newOptions.statusCode = {};
+        newOptions = $.extend({}, originalOptions, {
+            success: $.noop,
+            error: $.noop,
+            complete: $.noop,
+            statusCode: {}
+        });
 
         (function tryRequest( options, lastJqXHR ) {
             var willRetryDeferred = $.Deferred();
