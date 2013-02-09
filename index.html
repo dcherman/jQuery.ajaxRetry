@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="jQuery.ajaxRetry : " />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>jQuery.ajaxRetry</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/dcherman/jQuery.ajaxRetry">View on GitHub</a>
+
+          <h1 id="project_title">jQuery.ajaxRetry</h1>
+          <h2 id="project_tagline"></h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/dcherman/jQuery.ajaxRetry/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/dcherman/jQuery.ajaxRetry/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>jQuery.ajaxRetry</h1>
+
+<p>This plugin allows you to easily retry a failed ajax request while still allowing you to add callbacks via any of the normal options or deferreds.
+jQuery.ajaxRetry is supported on all version of jQuery from 1.5 to 1.9.1.</p>
+
+<h2>Usage</h2>
+
+<ul>
+<li>
+<p><strong>Boolean</strong>
+If you set this to <code>true</code>, your request will be retried until it successfully completes.  Be careful you don't DOS yourself here.</p>
+
+<pre><code>$.ajax({
+  shouldRetry: true
+});
+</code></pre>
+</li>
+<li>
+<p><strong>Number</strong>
+You can provide a simple number and the request will be retried that many times.</p>
+
+<pre><code>$.ajax({
+  // Retry this request up to 2 times
+  shouldRetry: 2
+});
+</code></pre>
+</li>
+<li>
+<p><strong>Function</strong>
+Passing a function is the most flexible and powerful way to handle your retries.  A retry will occur if your function returns <code>true</code>, or if it
+returns a <code>promise</code> that resolves to <code>true</code>.</p>
+
+<pre><code>$.ajax({
+  shouldRetry: function( jqXHR, retryCount, requestMethod ) {
+      // Retry only if the request method is POST and we have not retried this request yet.
+      return requestMethod === "POST" &amp;&amp; retryCount === 0;
+  }
+});
+</code></pre>
+
+<pre><code>$.ajax({
+  shouldRetry: function() {
+      // Always retry this request with a delay of 250ms between retries
+      return $.Deferred(function(dfr) {
+          setTimeout(function() {
+              dfr.resolve(true);
+          }, 250);
+      }).promise()
+  }
+});
+</code></pre>
+</li>
+</ul><h2>License</h2>
+
+<p>Copyright (c) 2013 Daniel Herman, contributors Licensed under the MIT license.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">jQuery.ajaxRetry maintained by <a href="https://github.com/dcherman">dcherman</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
