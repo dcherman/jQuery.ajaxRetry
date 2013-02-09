@@ -1,4 +1,4 @@
-/*! jQuery.ajaxRetry v0.1.2 | (c) 2013 Daniel Herman | opensource.org/licenses/MIT */
+/*! jQuery.ajaxRetry v0.1.3 | (c) 2013 Daniel Herman | opensource.org/licenses/MIT */
 (function( $ ) {
     "use strict";
     
