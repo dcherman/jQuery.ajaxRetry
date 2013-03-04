@@ -68,10 +68,9 @@
             complete: $.noop,
             statusCode: {}
         });
-
-        (function tryRequest( options, lastJqXHR ) {
-            var willRetryDeferred = $.Deferred();
-            
+        
+        // The finalizer will be called if the request failed and will not be retried.
+        (function tryRequest( options, lastJqXHR, finalizer ) {
             // If lastJqXHR === undefined at this point, then it's the first ever request.
             // Ensure that we always proceed without calling the shouldRetry function in that case
             ( !lastJqXHR ? $.when(true) : shouldRetry(lastJqXHR, retryCount++, options.type || "GET") ).done(function( willRetry ) {
@@ -87,22 +86,19 @@
                             var failureArgs = arguments,
                                 failureContext = this;
                             
-                            tryRequest( options, jqXHR ).done(function( willRetry ) {
-                                if ( willRetry !== true ) {
-                                    finalStatusCode = jqXHR.status;
-                                    dfr.rejectWith( failureContext, failureArgs );
-                                    dfr.fail( statusCode[finalStatusCode] );
-                                    completeDeferred.resolveWith( failureContext, [ jqXHR, textStatus ]);
-                                }
+                            tryRequest( options, jqXHR, function() {
+                                finalStatusCode = jqXHR.status;
+                                dfr.rejectWith( failureContext, failureArgs );
+                                dfr.fail( statusCode[finalStatusCode] );
+                                completeDeferred.resolveWith( failureContext, [ jqXHR, textStatus ]);
                             });
                         }
                     );
                 }
-                
-                willRetryDeferred.resolve( willRetry );
+                else {
+                    finalizer();
+                }
             });
- 
-            return willRetryDeferred.promise();
         }( newOptions ));
         
         // Install legacy deferred style functions.  These are deprecated,
