@@ -68,7 +68,7 @@ QUnit.config.testTimeout = 2000;
         
         
         // Don't assert the version of jQuery in git.  It's always changing, and we don't want to have to keep this up to date.
-        if ( !gitVersion ) {
+        if ( jqVersion !== "git" ) {
             test( "jQuery Version", function() {
                 expect(1);
                 
