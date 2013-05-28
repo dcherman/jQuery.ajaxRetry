@@ -13,26 +13,38 @@
         <script src="qunit-composite.js"></script>
         
         <script>
-            QUnit.testSuites([
-                "qunit.html?git",
-                "qunit.html?1.9.1",
-                "qunit.html?1.9.0",
-                "qunit.html?1.8.3",
-                "qunit.html?1.8.2",
-                "qunit.html?1.8.1",
-                "qunit.html?1.8.0",
-                "qunit.html?1.7.2",
-                "qunit.html?1.7.1",
-                "qunit.html?1.7",
-                "qunit.html?1.6.4",
-                "qunit.html?1.6.3",
-                "qunit.html?1.6.2",
-                "qunit.html?1.6.1",
-                "qunit.html?1.6",
-                "qunit.html?1.5.2",
-                "qunit.html?1.5.1",
-                "qunit.html?1.5"
-            ]);
+            (function( versions ) {
+                var i = versions.length;
+                
+                while( i-- ) {
+                    versions[ i ] = "qunit.html?jquery=" + versions[ i ];
+                }
+                
+                QUnit.testSuites( versions );
+            }([
+                "git",
+                "2.0.0",
+                "2.0.1",
+                "1.10.0",
+                "1.9.1",
+                "1.9.0",
+                "1.8.3",
+                "1.8.2",
+                "1.8.1",
+                "1.8.0",
+                "1.7.2",
+                "1.7.1",
+                "1.7",
+                "1.6.4",
+                "1.6.3",
+                "1.6.2",
+                "1.6.1",
+                "1.6",
+                "1.5.2",
+                "1.5.1",
+                "1.5"
+            ]));
+
         </script>
     </body>
 </html>
