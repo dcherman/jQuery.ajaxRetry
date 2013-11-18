@@ -208,6 +208,23 @@ QUnit.config.testTimeout = 2000;
                 url: "failThenSuccess",
                 shouldRetry: function() {
                     var dfr = $.Deferred();
+                    dfr.reject();
+                    return dfr.promise();
+                },
+                error: function() {
+                    ok( true, "Our error callback was called" );
+                },
+                complete: start
+            });
+        });
+
+        asyncTest( "shouldRetry - rejected promise", function() {
+            expect(1);
+            
+            $.ajax({
+                url: "failThenSuccess",
+                shouldRetry: function() {
+                    var dfr = $.Deferred();
                     dfr.resolve( false );
                     return dfr.promise();
                 },

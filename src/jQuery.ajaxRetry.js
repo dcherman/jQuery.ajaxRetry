@@ -59,6 +59,18 @@
                         break;
                 }
 
+                if ( typeof result === "object" && typeof result.then === "function" ) {
+                    // If the value returned from a function is a promise, then ensure that
+                    // if it's rejecteded, the promise returned from the function is resolved with false
+                    // in order to avoid any situations where the request just hangs if someone rejects a promise.
+                    // We can't simply use .then or .pipe here since those did not exist in 1.5
+                    return $.Deferred(function( dfr ) {
+                        result.then( dfr.resolve, function() {
+                            dfr.resolve( false );
+                        });
+                    }).promise();
+                }
+
                 return $.when( result );
             };
             
