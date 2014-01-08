@@ -42,7 +42,7 @@ $.ajax({
               setTimeout(function() {
                   dfr.resolve(true);
               }, 250);
-          }).promise()
+          }).promise();
       }
     });
 ```
