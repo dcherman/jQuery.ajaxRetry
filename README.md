@@ -1,7 +1,7 @@
 # jQuery.ajaxRetry
 
 This plugin allows you to easily retry a failed ajax request while still allowing you to add callbacks via any of the normal options or deferreds.
-jQuery.ajaxRetry is supported on all version of jQuery from 1.5 to 1.9.1.
+jQuery.ajaxRetry is supported on all version of jQuery from 1.5 - latest.
 
 ## Usage
 
@@ -48,5 +48,5 @@ $.ajax({
 ```
 
 ## License
-Copyright (c) 2013 Daniel Herman, contributors Licensed under the MIT license.
+Copyright (c) 2014 Daniel Herman, contributors Licensed under the MIT license.
 [![githalytics.com alpha](https://cruel-carlota.pagodabox.com/6893f686c161d2497e5d0080614ca6e6 "githalytics.com")](http://githalytics.com/dcherman/jQuery.ajaxRetry)
