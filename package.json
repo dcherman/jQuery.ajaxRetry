@@ -1,13 +1,17 @@
 {
-	"name": "jQuery.ajaxRetry",
-	"version": "0.2.0",
-	"dependencies": {},
-	"devDependencies": {
-        "grunt": "0.4.0",
-        "grunt-contrib-uglify": "0.1.1",
-        "grunt-contrib-jshint": "0.1.1",
-        "grunt-contrib-watch": "0.2.0",
-        "grunt-contrib-connect": "0.1.2",
-        "grunt-contrib-qunit": "0.1.1"
-	}
+  "name": "jQuery.ajaxRetry",
+  "version": "0.2.0",
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-cli": "~0.1.11",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-contrib-uglify": "~0.3.0",
+    "grunt-contrib-qunit": "~0.4.0",
+    "grunt-contrib-jshint": "~0.8.0",
+    "grunt-contrib-connect": "~0.6.0"
+  },
+  "scripts": {
+    "test": "node ./node_modules/grunt-cli/bin/grunt qunit"
+  }
 }
