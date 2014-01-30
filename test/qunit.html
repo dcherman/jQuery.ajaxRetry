@@ -10,32 +10,26 @@
         <div id="qunit-fixture"></div>
         <script src="qunit-1.10.0.js"></script>
         <script>
-            var jqVersion = QUnit.urlParams.jquery || "1.9.0";
-            
-            if ( jqVersion === "git" ) {
-                document.write( "<scri" + "pt src='http://code.jquery.com/jquery-git.js'></scri" + "pt>" );
-            } else {
-                document.write( "<scri" + "pt src='jquery-" + jqVersion + ".js'></scri" + "pt>" );
+            if ( !QUnit.urlParams.jquery ) {
+                QUnit.urlParams.jquery = "1.9.0";
             }
-            
-            // Hide some console.log messages from mockjax because damnit, they're annoying and I don't need to see them.
-            var enableMockLogging = false;
-            
-            if ( !enableMockLogging ) {
-                if ( typeof console !== "undefined" && console.log ) {
-                    (function() {
-                        var realLog = console.log;
-                        
-                        console.log = function( firstParam ) {
-                            if ( !/^MOCK/.test(firstParam) ) {
-                                realLog.apply( console, arguments )
-                            }
-                        };
-                    }());
-                }
-            }
+
+            document.write( "<scri" + "pt src='http://code.jquery.com/jquery-" + QUnit.urlParams.jquery + ".js'></scri" + "pt>" );
         </script>
         <script src="jquery.mockjax.js"></script>
+        <script>
+            // Don't assert the version of jQuery in git.  It's always changing, and we don't want to have to keep this up to date.
+            if ( !/git/.test( QUnit.urlParams.jquery ) ) {
+                test( "jQuery Version", function() {
+                    expect( 1 );
+                    
+                    ok( jQuery.fn.jquery === QUnit.urlParams.jquery, "The correct version of jQuery ( " + QUnit.urlParams.jquery + " ) is being tested" );
+                });
+            }
+
+            // Hide some console.log messages from mockjax because damnit, they're annoying and I don't need to see them.
+            $.mockjaxSettings.logging = false;
+        </script>
         <script src="../src/jQuery.ajaxRetry.js"></script>
         <script src="test.js"></script>
     </body>

@@ -1,2 +1,7 @@
 language: node_js
-node_js: "0.10"
+node_js: '0.10'
+script: "node ./node_modules/grunt-cli/bin/grunt travis"
+env:
+  global:
+  - secure: vSydp5dNhwnicrxCv/LeIwBoHei2Uu3J0fE7Dttm2xCmxU/uL3PcZg9CxG7INn7cN4TPtQM/r/Nr9+tjBA/U18+UEUgy30cUV0Jd2tVJJw+RSdw0usm3cNH/QbB67d/08IyobordSDHIDsDlFJtjHz/pSueojsLMCfY/omMDlqs=
+  - secure: fMlCHVfroRlA+UOiUiKvdnMk86HqsHVsLv/l5nRsuABj4Q5vy07BvEmcbcH9O9+/JacQfPF+YBTwyanO7gcLSUFjY3FWNPbnT0RU6lrJJoZbgnpDSD3BZJZgDvibTrhWAoJqQd7fTYfSzqDZKr8N6T862Jgz9FcNIZXgRT4SCAg=

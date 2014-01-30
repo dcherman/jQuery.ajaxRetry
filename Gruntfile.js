@@ -4,14 +4,15 @@ module.exports = function( grunt ) {
     grunt.loadNpmTasks( "grunt-contrib-uglify" );
     grunt.loadNpmTasks( "grunt-contrib-watch" );
     grunt.loadNpmTasks( "grunt-contrib-qunit" );
-    
-    var jQueryManifest = grunt.file.readJSON( "jquery.ajaxRetry.jquery.json" );
-    
+    grunt.loadNpmTasks( "grunt-saucelabs" );
+	
+	grunt.loadTasks( "tasks" );
+
     grunt.initConfig({
         watch: {
             dev: {
               files: "<%= jshint.all %>",
-              tasks: [ "jshint", "qunit" ]
+              tasks: [ "jshint", "fetch_jquery_versions", "qunit" ]
             }
         },
         uglify: {
@@ -21,6 +22,30 @@ module.exports = function( grunt ) {
                 },
                 files: {
                     "jQuery.ajaxRetry.min.js": [ "src/jQuery.ajaxRetry.js" ]
+                }
+            }
+        },
+        "fetch_jquery_versions": {
+            options: {
+                output: "test/jquery-versions.js",
+                minVer: "1.5.0"
+            }
+        },
+        "saucelabs-qunit": {
+            all: {
+                options: {
+                    username: process.env.SAUCE_USERNAME,
+                    key: process.env.SAUCE_ACCESS_KEY,
+                    urls: [
+                        "http://127.0.0.1:8001/test/master.html"
+                    ],
+                    build: process.env.TRAVIS_JOB_ID,
+                    browsers: [
+                        { browserName: "chrome" },
+                        { browserName: "firefox" },
+                        { browserName: "internet explorer" }
+                    ],
+                    testName: "Master Test Suite"
                 }
             }
         },
@@ -38,9 +63,15 @@ module.exports = function( grunt ) {
         },
         jshint: {
             all: [
-                "grunt.js",
+                "tasks/**/*.js",
                 "src/**/*.js"
             ],
+            grunt: {
+                options: {
+                    node: true
+                },
+                src: [ "Gruntfile.js" ]
+            },
             test: {
                 files: {
                     src: [ "test/test.js" ]
@@ -50,9 +81,10 @@ module.exports = function( grunt ) {
                         $: false,
                         QUnit: false,
                         start: false,
+                        expect: false,
+                        module: false,
                         ok: false,
                         asyncTest: false,
-                        gitVersion: false,
                         jQuery: false
                     }
                 }
@@ -72,13 +104,16 @@ module.exports = function( grunt ) {
                 nonew: true,
                 noempty: true,
                 globals: {
-                    jQuery: false
+                    jQuery: false,
+                    require: false,
+                    module: false
                 }
             },
             
         }
     });
     
-    grunt.registerTask( "default", [ "jshint", "qunit", "uglify" ]);
+    grunt.registerTask( "default", [ "jshint", "fetch_jquery_versions", "qunit", "uglify" ]);
     grunt.registerTask( "dev", [ "connect", "watch" ]);
+    grunt.registerTask( "travis", [ "jshint", "fetch_jquery_versions", "connect", "saucelabs-qunit" ]);
 };

@@ -1,4 +1,3 @@
-/*global module:false, test:false, ok:false, expect:false, jqVersion:false */
 QUnit.config.testTimeout = 2000;
 
 (function() {
@@ -65,16 +64,6 @@ QUnit.config.testTimeout = 2000;
                 $.mockjaxClear( this.failThenSuccessMock );
             }
         });
-        
-        
-        // Don't assert the version of jQuery in git.  It's always changing, and we don't want to have to keep this up to date.
-        if ( jqVersion !== "git" ) {
-            test( "jQuery Version", function() {
-                expect(1);
-                
-                ok( jQuery.fn.jquery === jqVersion, "The correct version of jQuery ( " + jqVersion + " ) is being tested" );
-            });
-       }
         
         asyncTest( "shouldRetry - ajaxSetup", function() {
             expect(1);
