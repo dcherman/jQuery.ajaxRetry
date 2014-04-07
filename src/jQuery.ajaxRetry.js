@@ -1,5 +1,11 @@
-/*! jQuery.ajaxRetry v0.1.3 | (c) 2013 Daniel Herman | opensource.org/licenses/MIT | https://github.com/dcherman/jQuery.ajaxRetry */
-(function( $ ) {
+/*! jQuery.ajaxRetry v0.3.0 | (c) 2013 Daniel Herman | opensource.org/licenses/MIT | https://github.com/dcherman/jQuery.ajaxRetry */
+(function( root, factory ) {
+    if ( typeof define === 'function' && define.amd ) {
+        define([ 'jquery' ], factory );
+    } else {
+        factory( root.jQuery );
+    }
+}( this, function( $ ) {
     "use strict";
     
     var retryKey = "__RETRY__" + new Date().getTime();
@@ -145,4 +151,4 @@
             return this;
         };
     });
-}( jQuery ));
+}));
