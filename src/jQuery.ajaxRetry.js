@@ -84,7 +84,20 @@
         (function tryRequest( options, lastJqXHR, finalizer ) {
             // If lastJqXHR === undefined at this point, then it's the first ever request.
             // Ensure that we always proceed without calling the shouldRetry function in that case
-            ( !lastJqXHR ? $.when(true) : shouldRetry(lastJqXHR, retryCount++, options.type || "GET") ).done(function( willRetry ) {
+            ( !lastJqXHR ? $.when(true) : shouldRetry(lastJqXHR, retryCount++, options.type || "GET") ).done(function( retryOptions ) {
+                var willRetry = false;
+                if ($.type(retryOptions) === "boolean"){
+                    // if the returned value is a boolean, then set willRetry to that value
+                    willRetry = retryOptions;
+                } else if ($.type(retryOptions) === "object"){
+                    // if it's an object, then set willRetry from the willRetry property, 
+                    // remove it from the properties and extend the options
+                    willRetry = retryOptions.willRetry;
+                    delete retryOptions.willRetry;
+                    
+                    // extend the options
+                    $.extend(options, retryOptions);
+                }
                 if ( willRetry === true ) {
                     (!lastJqXHR ? jqXHR : $.ajax(options) ).then(
                         function( data, textStatus, jqXHR ) {
