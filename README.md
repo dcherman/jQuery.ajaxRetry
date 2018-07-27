@@ -1,6 +1,7 @@
 # jQuery.ajaxRetry
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/3394a45c5fc14b1e8c1287acb2985ddf)](https://app.codacy.com/app/dcherman/jQuery.ajaxRetry?utm_source=github.com&utm_medium=referral&utm_content=dcherman/jQuery.ajaxRetry&utm_campaign=badger)
+[![Total Alerts](https://img.shields.io/lgtm/alerts/g/dcherman/jQuery.ajaxRetry.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/dcherman/jQuery.ajaxRetry/alerts/)
 [![Build Status](https://travis-ci.org/dcherman/jQuery.ajaxRetry.svg?branch=master)](https://travis-ci.org/dcherman/jQuery.ajaxRetry)
 
 This plugin allows you to easily retry a failed ajax request while still allowing you to add callbacks via any of the normal options or deferreds.
