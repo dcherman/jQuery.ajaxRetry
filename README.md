@@ -53,4 +53,3 @@ $.ajax({
 
 ## License
 Copyright (c) 2014 Daniel Herman, contributors Licensed under the MIT license.
-[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/6893f686c161d2497e5d0080614ca6e6 "githalytics.com")](http://githalytics.com/dcherman/jQuery.ajaxRetry)
